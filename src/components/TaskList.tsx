@@ -3,8 +3,9 @@ import { useState } from 'react'
 import '../styles/tasklist.scss'
 
 import { FiTrash, FiCheckSquare } from 'react-icons/fi'
+import { AiFillEdit } from 'react-icons/ai'
 
-interface Task {
+type Task = {
   id: number;
   title: string;
   isComplete: boolean;
@@ -16,14 +17,41 @@ export function TaskList() {
 
   function handleCreateNewTask() {
     // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+    
+    (newTaskTitle != "") ? (
+      setTasks(tasks.concat(
+        {
+          id: Number(new Date().getTime()),
+          title: newTaskTitle,
+          isComplete: false
+        }
+      ))
+    ) : null;
+
+    setNewTaskTitle("");
+    
   }
 
   function handleToggleTaskCompletion(id: number) {
     // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+    // Meu erro foi pensar que .map modifica a estrutura interna do tasks
+    setTasks(
+      tasks.map(oldState => (oldState.id == id) ? {
+        ...oldState,
+        isComplete : !oldState.isComplete 
+      } : oldState)
+    )
   }
 
   function handleRemoveTask(id: number) {
     // Remova uma task da listagem pelo ID
+    // Meu erro foi no sinal de diferente "!="
+    setTasks(oldState => oldState.filter(task => task.id != id));
+  }
+
+  function handleChangeTaskTitle(id: number){
+    // modificar o título da tarefa
+    
   }
 
   return (
@@ -61,9 +89,16 @@ export function TaskList() {
                 <p>{task.title}</p>
               </div>
 
-              <button type="button" data-testid="remove-task-button" onClick={() => handleRemoveTask(task.id)}>
-                <FiTrash size={16}/>
-              </button>
+              <div>
+                <button type="button" data-testid="edit-task-button" onClick={() => handleChangeTaskTitle(task.id)}>
+                  <AiFillEdit size={20}/>
+                </button>
+
+                <button type="button" data-testid="remove-task-button" onClick={() => handleRemoveTask(task.id)}>
+                  <FiTrash size={16}/>
+                </button>
+              </div>
+              
             </li>
           ))}
           
